@@ -11,3 +11,6 @@ By specifying some input values (size, n, w[um], s[um]) and the layer number of 
 
 ### Prerequisites
 - gdspy
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
