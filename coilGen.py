@@ -6,6 +6,20 @@ import gdspy
 import argparse
 
 
+def calcRes(size, numOfTurn, width, space, sheetRes):
+    res = 4*sheetRes*numOfTurn/width*(size+(1-numOfTurn)*(width+space))*(10**(-3))
+    return res
+
+
+def calcInd(size, numOfTurn, width, space):
+    # "Simple accurate expressions for planar spiral inductances," IEEE JSSC1999.
+    Do = size
+    Di = size-(width+space)*(numOfTurn-1)-width
+    Davg = (Do+Di)/2
+    ind = 1.62*10**(-3)*(Do**-1.21)*(width**(-0.147))*(Davg**2.40)*(numOfTurn**1.78)*(space**(-0.030))
+    return ind
+
+
 def main(size, numOfTurn, width, space, layerNum):
     
     # The GDSII file is called a library, which contains multiple cells.
@@ -67,7 +81,12 @@ if __name__ == "__main__":
     parser.add_argument('--n', default=2, type=int, help='number of turns')
     parser.add_argument('--w', default=1.0, type=float, help='line width[um]')
     parser.add_argument('--s', default=1.0, type=float, help='line space[um]')
+    parser.add_argument('--Rs', default=47, type=float, help='Sheet resistance[mohm/sq], 125 (SKY130, Metal-1/2), 47 (SKY130, Metal-3/4), 28.5 (SKY130, Metal-5)')
     parser.add_argument('layerNum', type=int, help='layer number of the output GDSII file')
     args = parser.parse_args()
     
     main(args.size, args.n, args.w, args.s, args.layerNum)
+    res = calcRes(args.size, args.n, args.w, args.s, args.Rs)
+    print('R = {} [ohm]'.format(res))
+    ind = calcInd(args.size, args.n, args.w, args.s)
+    print('L = {} [nH]'.format(ind))
